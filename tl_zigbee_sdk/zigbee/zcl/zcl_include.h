@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #ifndef ZCL_INCLUDE_H
 #define ZCL_INCLUDE_H
 
@@ -48,7 +47,7 @@
 #include "general/zcl_pollCtrl.h"
 #include "general/zcl_greenPower.h"
 
-//Closures
+/* Closures */
 #include "closures/zcl_window_covering.h"
 #include "closures/zcl_door_lock.h"
 

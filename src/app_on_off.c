@@ -20,13 +20,9 @@ static uint16_t hum_test = 1800;        // 18%
 static uint8_t hum_direction = 1;
 #endif
 
-static void cmdOnOff(uint8_t ep, uint8_t command) {
-    epInfo_t dstEpInfo;
-    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+static status_t cmdOnOffSend(uint8_t ep, epInfo_t *dstEpInfo, uint8_t command) {
 
-    dstEpInfo.profileId = HA_PROFILE_ID;
-
-    dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
+    status_t st = 0xFF;
 
     /* command 0x00 - off, 0x01 - on, 0x02 - toggle */
 
@@ -35,22 +31,90 @@ static void cmdOnOff(uint8_t ep, uint8_t command) {
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: 'off' in endPoint: %d\r\n", ep);
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_offCmd(ep, &dstEpInfo, FALSE);
+            st = zcl_onOff_offCmd(ep, dstEpInfo, FALSE);
             break;
         case ZCL_CMD_ONOFF_ON:
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: 'on' in endPoint: %d\r\n", ep);
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_onCmd(ep, &dstEpInfo, FALSE);
+            st = zcl_onOff_onCmd(ep, dstEpInfo, FALSE);
             break;
         case ZCL_CMD_ONOFF_TOGGLE:
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: 'toggle' in endPoint: %d\r\n", ep);
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_toggleCmd(ep, &dstEpInfo, FALSE);
+            st = zcl_onOff_toggleCmd(ep, dstEpInfo, FALSE);
             break;
         default:
             break;
+    }
+
+    return st;
+}
+
+static void cmdOnOff(uint8_t ep, uint8_t command) {
+
+    status_t st;
+    epInfo_t dstEpInfo;
+    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+    dstEpInfo.profileId = HA_PROFILE_ID;
+
+    uint16_t groupList[APS_GROUP_TABLE_NUM];
+    uint8_t groupCnt = 0;
+    aps_group_list_get(&groupCnt, groupList);
+
+    /* command for groups */
+    dstEpInfo.dstAddrMode = APS_SHORT_GROUPADDR_NOEP;
+    for (uint8_t i = 0; i < groupCnt; i++) {
+        aps_group_tbl_ent_t *grEntry = aps_group_search(groupList[i], ep);
+        if (grEntry) {
+            dstEpInfo.dstAddr.shortAddr = grEntry->group_addr;
+            st = cmdOnOffSend(ep, &dstEpInfo, command);
+#if UART_PRINTF_MODE && DEBUG_ONOFF
+            printf("OnOff in groups. cmd: %d, src_ep: %d, dst_ep: %d, addr: 0x%04x, status: %d\r\n",
+                    (command == 0)?"Off":(command == 1)?"On":"Toggle", ep, grEntry->n_endpoints, grEntry->group_addr, st);
+#endif
+        }
+    }
+
+    /* command when binding */
+    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+    dstEpInfo.profileId = HA_PROFILE_ID;
+
+    aps_binding_entry_t *bind_tbl = bindTblEntryGet();
+    for (uint8_t j = 0; j < APS_BINDING_TABLE_NUM; j++) {
+        if (bind_tbl->used && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF && bind_tbl->srcEp == ep) {
+            dstEpInfo.dstAddrMode = bind_tbl->dstAddrMode;
+            if (dstEpInfo.dstAddrMode == APS_SHORT_GROUPADDR_NOEP) {
+                dstEpInfo.dstAddr.shortAddr = bind_tbl->groupAddr;
+            } else {
+                dstEpInfo.dstAddrMode = APS_LONG_DSTADDR_WITHEP;
+                dstEpInfo.dstEp = bind_tbl->dstExtAddrInfo.dstEp;
+                memcpy(dstEpInfo.dstAddr.extAddr, bind_tbl->dstExtAddrInfo.extAddr, sizeof(extAddr_t));
+            }
+            st = cmdOnOffSend(ep, &dstEpInfo, command);
+#if UART_PRINTF_MODE && DEBUG_ONOFF
+            printf("OnOff for bind. cmd: %s, ep: %d, clId: 0x%04x, addrMode: %d - %s, ",
+                    (command == 0)?"Off":(command == 1)?"On":"Toggle",
+                     bind_tbl->srcEp, bind_tbl->clusterId, dstEpInfo.dstAddrMode,
+                    (dstEpInfo.dstAddrMode == APS_DSTADDR_EP_NOTPRESETNT)?"APS_DSTADDR_EP_NOTPRESETNT":
+                    (dstEpInfo.dstAddrMode == APS_SHORT_GROUPADDR_NOEP)?"APS_SHORT_GROUPADDR_NOEP":
+                    (dstEpInfo.dstAddrMode == APS_SHORT_DSTADDR_WITHEP)?"APS_SHORT_DSTADDR_WITHEP":"APS_LONG_DSTADDR_WITHEP");
+            if (dstEpInfo.dstAddrMode == APS_LONG_DSTADDR_WITHEP) {
+                printf("ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x, ",
+                        bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                        bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                        bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                        bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+            } else if (dstEpInfo.dstAddrMode == APS_SHORT_GROUPADDR_NOEP) {
+                printf("groupAddr: 0x%04x, ", dstEpInfo.dstAddr.shortAddr);
+            } else {
+                printf("shortAddr: 0x%04x, ", dstEpInfo.dstAddr.shortAddr);
+            }
+            printf("status: 0x%02x\r\n", st);
+#endif
+        }
+        bind_tbl++;
     }
 }
 
@@ -221,7 +285,9 @@ static void proc_hum_onoff(uint8_t ep) {
     bool one_device = onoff_get_one_device();
 
 #if HUMIDITY_TEST
+    zcl_humidityAttr_t *orig_humAttrs = zcl_humidityAttrGet();
     zcl_humidityAttr_t humAttrs_test;
+    memcpy(&humAttrs_test, orig_humAttrs, sizeof(zcl_humidityAttr_t));
     humAttrs_test.value = hum_test;
     zcl_humidityAttr_t *humAttrs = &humAttrs_test;
     printf("humidity: %d%%\r\n", humAttrs->value / 100);
@@ -445,9 +511,9 @@ static void procTempHumOnOff(uint8_t t_ep, uint8_t h_ep) {
 
 void proc_temp_hum_onoff() {
 
-//#if UART_PRINTF_MODE && DEBUG_ONOFF
-//    printf("Start OnOff control\r\n");
-//#endif /* UART_PRINTF_MODE */
+#if UART_PRINTF_MODE && DEBUG_ONOFF
+    printf("Start OnOff control\r\n");
+#endif /* UART_PRINTF_MODE */
 
     if (app_edle_bind_tbl()) return;
 

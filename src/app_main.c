@@ -48,9 +48,10 @@ const zdo_appIndCb_t appCbLst = {
 /**
  *  @brief Definition for BDB finding and binding cluster
  */
-uint16_t bdb_findBindClusterList[] =
-{
-    ZCL_CLUSTER_GEN_ON_OFF,
+uint16_t bdb_findBindClusterList[] = {
+    ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
+    ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
+    ZCL_CLUSTER_GEN_POWER_CFG
 };
 
 /**

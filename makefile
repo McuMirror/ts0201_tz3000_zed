@@ -100,10 +100,13 @@ GCC_FLAGS += \
 -DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
 endif
   
+DEBUG ?= "-DUART_PRINTF_MODE=ON"
+
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
-$(PROJECT_DEF)
+$(PROJECT_DEF) \
+$(DEBUG)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -156,8 +159,8 @@ all: pre-build main-build
 flash8000: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 
-flash0: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
+flash0:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 
 erase-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s ea

@@ -66,7 +66,9 @@
 #include "version_cfg.h"
 
 /* Debug mode config */
+#ifndef UART_PRINTF_MODE
 #define UART_PRINTF_MODE                ON
+#endif
 #define USB_PRINTF_MODE                 OFF
 
 #define DEBUG_BUTTON                    ON
@@ -86,7 +88,7 @@
 
 /* BDB */
 #define TOUCHLINK_SUPPORT               ON
-#define FIND_AND_BIND_SUPPORT           OFF
+#define FIND_AND_BIND_SUPPORT           ON
 
 /* Board define */
 #if defined(MCU_CORE_826x)

@@ -84,10 +84,9 @@ s32 app_bdbNetworkSteerStart(void *arg){
 
 #if FIND_AND_BIND_SUPPORT
 s32 app_bdbFindAndBindStart(void *arg){
-	BDB_ATTR_GROUP_ID_SET(0x1234);//only for initiator
 	bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_INITIATOR);
 
-	g_switchAppCtx.bdbFBTimerEvt = NULL;
+	g_appCtx.bdbFBTimerEvt = NULL;
 	return -1;
 }
 #endif
@@ -205,8 +204,8 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 #endif
 #if FIND_AND_BIND_SUPPORT
 			//start Finding & Binding
-			if(!g_switchAppCtx.bdbFBTimerEvt){
-				g_switchAppCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
+			if(!g_appCtx.bdbFBTimerEvt){
+			    g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
 			}
 #endif
 
@@ -288,7 +287,7 @@ void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo){
 	dstEpInfo.dstEp = pDstInfo->endpoint;
 	dstEpInfo.profileId = HA_PROFILE_ID;
 
-	zcl_identify_identifyCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE, 0, 0);
+	zcl_identify_identifyCmd(APP_ENDPOINT1, &dstEpInfo, FALSE, 0, 0);
 #endif
 }
 

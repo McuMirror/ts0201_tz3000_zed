@@ -56,11 +56,16 @@ static void buttonSinglePressed(u8 btNum) {
 //static void buttonDoublePressed(u8 btNum) {
 //    printf("Command double click\r\n");
 //}
-//
-//static void buttonTriplePressed(u8 btNum) {
-//    printf("Command triple click\r\n");
-//}
-//
+
+static void buttonTriplePressed(u8 btNum) {
+#if UART_PRINTF_MODE && DEBUG_BUTTON
+            printf("Button push 3 times\r\n");
+#endif
+    if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
+    }
+}
+
 //static void buttonQuadruplePressed(u8 btNum) {
 //    printf("Command quadruple click\r\n");
 //}
@@ -73,8 +78,8 @@ static void buttonCheckCommand(uint8_t btNum) {
         buttonSinglePressed(btNum);
 //    } else if (g_appCtx.button[btNum-1].ctn == 2) {
 //        buttonDoublePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 3) {
-//        buttonTriplePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 3) {
+        buttonTriplePressed(btNum);
 //    } else if (g_appCtx.button[btNum-1].ctn == 4) {
 //        buttonQuadruplePressed(btNum);
     }

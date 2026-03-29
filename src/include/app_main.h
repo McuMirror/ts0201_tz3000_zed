@@ -88,6 +88,7 @@ void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf);
 void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);
 void app_otaProcessMsgHandler(uint8_t evt, uint8_t status);
 void app_wakeupPinLevelChange();
+int32_t app_bdbFindAndBindStart(void *arg);
 
 
 #endif /* SRC_INCLUDE_APP_MAIN_H_ */
