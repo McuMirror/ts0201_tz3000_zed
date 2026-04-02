@@ -49,20 +49,40 @@ static void buttonSinglePressed(u8 btNum) {
     }
 }
 
-//static void buttonDoublePressed(u8 btNum) {
-//    printf("Command double click\r\n");
-//}
+static void buttonDoublePressed(u8 btNum) {
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 2 times\r\n");
+    aps_binding_entry_t *bind_tbl = bindTblEntryGet();
+    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+        if (bind_tbl->used && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+            APP_DEBUG(DEBUG_ONOFF_EN, "src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+                    bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+                    bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                    bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                    bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                    bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+
+        }
+        bind_tbl++;
+    }
+}
 
 static void buttonTriplePressed(u8 btNum) {
     APP_DEBUG(DEBUG_BUTTON_EN, "Button push 3 times\r\n");
     if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.find_bind_src_ep = APP_ENDPOINT1;
+        g_appCtx.find_bind_flag = true;
         g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
     }
 }
 
-//static void buttonQuadruplePressed(u8 btNum) {
-//    printf("Command quadruple click\r\n");
-//}
+static void buttonQuadruplePressed(u8 btNum) {
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 4 times\r\n");
+    if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.find_bind_src_ep = APP_ENDPOINT2;
+        g_appCtx.find_bind_flag = true;
+        g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
+    }
+}
 
 
 static void buttonCheckCommand(uint8_t btNum) {
@@ -70,12 +90,12 @@ static void buttonCheckCommand(uint8_t btNum) {
 
     if (g_appCtx.button[btNum-1].ctn == 1) {
         buttonSinglePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 2) {
-//        buttonDoublePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 2) {
+        buttonDoublePressed(btNum);
     } else if (g_appCtx.button[btNum-1].ctn == 3) {
         buttonTriplePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 4) {
-//        buttonQuadruplePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 4) {
+        buttonQuadruplePressed(btNum);
     }
 
     g_appCtx.button[btNum-1].ctn = 0;

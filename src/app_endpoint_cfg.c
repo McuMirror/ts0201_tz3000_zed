@@ -51,6 +51,7 @@ const uint16_t app_ep1_inClusterList[] =
 
 const uint16_t app_ep2_inClusterList[] =
 {
+    ZCL_CLUSTER_GEN_IDENTIFY,
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,
 #endif
@@ -172,6 +173,20 @@ const zclAttrInfo_t identify_attrTbl[] =
 };
 
 #define ZCL_IDENTIFY_ATTR_NUM           sizeof(identify_attrTbl) / sizeof(zclAttrInfo_t)
+
+zcl_identifyAttr_t g_zcl_identify2Attrs =
+{
+    .identifyTime   = 0x0000,
+};
+
+const zclAttrInfo_t identify2_attrTbl[] =
+{
+    { ZCL_ATTRID_IDENTIFY_TIME,             ZCL_UINT16,   RW,   (uint8_t*)&g_zcl_identify2Attrs.identifyTime },
+
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,    (uint8_t*)&zcl_attr_global_clusterRevision},
+};
+
+#define ZCL_IDENTIFY2_ATTR_NUM           sizeof(identify2_attrTbl) / sizeof(zclAttrInfo_t)
 
 /* power */
 zcl_powerAttr_t g_zcl_powerAttrs =
@@ -348,6 +363,7 @@ const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
 uint8_t APP_EP1_CB_CLUSTER_NUM = (sizeof(g_appEp1ClusterList)/sizeof(g_appEp1ClusterList[0]));
 
 const zcl_specClusterInfo_t g_appEp2ClusterList[] = {
+    {ZCL_CLUSTER_GEN_IDENTIFY,               MANUFACTURER_CODE_NONE, ZCL_IDENTIFY2_ATTR_NUM,         identify2_attrTbl,         zcl_identify_register,                  app_identifyCb      },
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     {ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,   MANUFACTURER_CODE_NONE, ZCL_ON_OFF_SWITCH_CFG_ATTR2_NUM, onoff_switch_cfg_attr2Tbl,  zcl_onOffSwitchCfg_register,            NULL              },
 #endif

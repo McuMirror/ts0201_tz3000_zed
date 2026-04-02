@@ -1,18 +1,20 @@
 # Add inputs and outputs from these tool invocations to the build variables
 OUT_DIR += \
 /$(SRC_PATH) \
-/$(SRC_PATH)/zcl \
-/$(SRC_PATH)/zdo \
+/$(SRC_PATH)/zigbee/zcl \
+/$(SRC_PATH)/zigbee/zdo \
+/$(SRC_PATH)/zigbee/bdb \
 /$(SRC_PATH)/sensors \
 /$(SRC_PATH)/common
  
 OBJS += \
 $(OUT_PATH)/$(SRC_PATH)/common/main.o \
 $(OUT_PATH)/$(SRC_PATH)/common/flash.o \
-$(OUT_PATH)/$(SRC_PATH)/zcl/zcl_relative_humidity_measurement.o \
-$(OUT_PATH)/$(SRC_PATH)/zcl/zcl_onoffSwitchCfg.o \
-$(OUT_PATH)/$(SRC_PATH)/zcl/zcl_reporting.o \
-$(OUT_PATH)/$(SRC_PATH)/zdo/zdp.o \
+$(OUT_PATH)/$(SRC_PATH)/zigbee/zcl/zcl_relative_humidity_measurement.o \
+$(OUT_PATH)/$(SRC_PATH)/zigbee/zcl/zcl_onoffSwitchCfg.o \
+$(OUT_PATH)/$(SRC_PATH)/zigbee/zcl/zcl_reporting.o \
+$(OUT_PATH)/$(SRC_PATH)/zigbee/zdo/zdp.o \
+$(OUT_PATH)/$(SRC_PATH)/zigbee/bdb/bdb.o \
 $(OUT_PATH)/$(SRC_PATH)/sensors/cht8305.o \
 $(OUT_PATH)/$(SRC_PATH)/sensors/sht30.o \
 $(OUT_PATH)/$(SRC_PATH)/sensors/sht40.o \

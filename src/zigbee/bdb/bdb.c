@@ -26,12 +26,12 @@
 /**********************************************************************
  * INCLUDES
  */
-#include "../common/includes/zb_common.h"
-#include "../zcl/zcl_include.h"
-#include "../zcl/zll_commissioning/zcl_zll_commissioning_internal.h"
-#include "includes/bdb.h"
+#include "zb_common.h"
+#include "zcl_include.h"
+#include "zll_commissioning/zcl_zll_commissioning_internal.h"
+#include "bdb.h"
 
-#include "app_utility.h"
+#include "app_main.h"
 
 
 /**********************************************************************
@@ -435,8 +435,10 @@ _CODE_BDB_ static void bdb_ieeeAddrResp(void *arg)
  *
  * @return  None
  */
-_CODE_BDB_ static void bdb_findingAndBinding(findBindDst_t *pDstInfo)
-{
+_CODE_BDB_ static void bdb_findingAndBinding(findBindDst_t *pDstInfo) {
+
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_findingAndBinding\r\n");
+
     zdo_bind_dstAddr_t bindDstAddr;
     memset((u8 *)&bindDstAddr, 0, sizeof(zdo_bind_dstAddr_t));
 
@@ -497,10 +499,10 @@ _CODE_BDB_ static void bdb_findingAndBinding(findBindDst_t *pDstInfo)
  */
 _CODE_BDB_ static void bdb_SimpleDescResp(void *arg)
 {
-    APP_DEBUG(DEBUG_BIND_EN, "bdb_SimpleDescResp\r\n");
     zdo_zdpDataInd_t *p = (zdo_zdpDataInd_t *)arg;
     zdo_simple_descriptor_resp_t *simpDescResp = (zdo_simple_descriptor_resp_t *)p->zpdu;
 
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_SimpleDescResp, status: %d\r\n", simpDescResp->status);
     if (simpDescResp->status == SUCCESS) {
         if (g_bdbCtx.matchClusterList || g_bdbCtx.matchClusterNum) {
                 return;
@@ -555,7 +557,7 @@ _CODE_BDB_ static void bdb_SimpleDescResp(void *arg)
  */
 _CODE_BDB_ static void bdb_commissioningFindBindSimpleDescReq(void)
 {
-    APP_DEBUG(DEBUG_BIND_EN, "bdb_commissioningFindBindSimpleDescReq\r\n");
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_commissioningFindBindSimpleDescReq\r\n");
     if (BDB_STATE_GET() == BDB_STATE_COMMISSIONING_FINDORBIND &&
         g_bdbCtx.role == BDB_COMMISSIONING_ROLE_INITIATOR) {
         zdo_simple_descriptor_req_t req;
@@ -694,7 +696,7 @@ _CODE_BDB_ static s32 bdb_findBindIdentifyTimeout(void *arg)
  */
 _CODE_BDB_ static u8 bdb_commissioningFindBind(void)
 {
-    APP_DEBUG(DEBUG_BIND_EN, "bdb_commissioningFindBind\r\n");
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_commissioningFindBind\r\n");
     if (g_bdbAttrs.commissioningMode.findOrBind) {
         if (g_bdbAttrs.nodeIsOnANetwork) {
             /* Perform finding & binding according to cluster class */
@@ -720,7 +722,18 @@ _CODE_BDB_ static u8 bdb_commissioningFindBind(void)
                 dstEpInfo.dstEp = 0xff;
                 dstEpInfo.profileId = HA_PROFILE_ID;
 
-                zcl_identify_identifyQueryCmd(g_bdbCtx.simpleDesc->endpoint, &dstEpInfo, TRUE);
+                uint8_t ep;
+
+                if (g_appCtx.find_bind_flag) {
+                    APP_DEBUG(DEBUG_BDB_EN, "find and bind starting\r\n");
+                    ep = g_appCtx.find_bind_src_ep;
+                    g_appCtx.find_bind_flag = false;
+                } else {
+                    APP_DEBUG(DEBUG_BDB_EN, "Not find and bind\r\n");
+                    ep = g_bdbCtx.simpleDesc->endpoint;
+                }
+
+                zcl_identify_identifyQueryCmd(ep, &dstEpInfo, TRUE);
 
                 u32 identifyQueryRcvTimeout = 5000;
 #ifdef ZB_ED_ROLE
@@ -749,13 +762,18 @@ _CODE_BDB_ static u8 bdb_commissioningFindBind(void)
  *
  * @return  None
  */
-_CODE_BDB_ static u8 bdb_commissioningNetworkFormation(void)
-{
+_CODE_BDB_ static u8 bdb_commissioningNetworkFormation(void) {
+
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_commissioningNetworkFormation\r\n");
+
     u8 bdbFormation = BDB_STATE_IDLE;
     if (!g_bdbAttrs.commissioningMode.networkFormation) {
+        APP_DEBUG(DEBUG_BDB_EN, "!networkFormation\r\n");
         return bdb_commissioningFindBind();
     } else {
+        APP_DEBUG(DEBUG_BDB_EN, "networkFormation\r\n");
         if (g_bdbAttrs.nodeIsOnANetwork) {
+            APP_DEBUG(DEBUG_BDB_EN, "nodeIsOnANetwork\r\n");
             return bdb_commissioningFindBind();
         } else {
 #if ZB_ROUTER_ROLE
@@ -1747,8 +1765,10 @@ _CODE_BDB_ void bdb_findBindMatchClusterSet(u8 clusterNum, u16 clusterId[])
  *
  * @return  TRUE / FALSE
  */
-_CODE_BDB_ bool bdb_addIdentifyActiveEpForFB(findBindDst_t dstInfo)
-{
+_CODE_BDB_ bool bdb_addIdentifyActiveEpForFB(findBindDst_t dstInfo) {
+
+    APP_DEBUG(DEBUG_BDB_EN, "bdb_addIdentifyActiveEpForFB\r\n");
+
     if (BDB_STATE_GET() == BDB_STATE_COMMISSIONING_FINDORBIND &&
         g_bdbCtx.role == BDB_COMMISSIONING_ROLE_INITIATOR) {
         if (!g_bdbCtx.pFindBindQ) {

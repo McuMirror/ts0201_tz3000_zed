@@ -1,5 +1,5 @@
-#ifndef SRC_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_
-#define SRC_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_
+#ifndef SRC_ZIGBEE_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_
+#define SRC_ZIGBEE_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_
 
 #include "app_cfg.h"
 
@@ -17,4 +17,4 @@
 status_t zcl_humidity_measurement_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb);
 
 
-#endif /* SRC_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_ */
+#endif /* SRC_ZIGBEE_ZCL_ZCL_RELATIVE_HUMIDITY_MEASUREMENT_H_ */

@@ -75,7 +75,7 @@ INCLUDE_PATHS := \
 -I$(SRC_PATH)/include \
 -I$(SRC_PATH)/common \
 -I$(SRC_PATH)/sensors \
--I$(SRC_PATH)/zcl
+-I$(SRC_PATH)/zigbee/zcl
  
 
 LS_FLAGS := $(SDK_PATH)/platform/boot/8258/boot_8258.link
@@ -239,8 +239,9 @@ clean-project:
 	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/sensors/*.o
-	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zcl/*.o
-	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zdo/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/zcl/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/zdo/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/bdb/*.o
 	-@echo ' '
 	
 pre-build:

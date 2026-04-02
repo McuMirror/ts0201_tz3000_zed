@@ -1,5 +1,5 @@
-#ifndef SRC_ZCL_ZCL_CUSTOM_ATTR_H_
-#define SRC_ZCL_ZCL_CUSTOM_ATTR_H_
+#ifndef SRC_ZIGBEE_ZCL_ZCL_CUSTOM_ATTR_H_
+#define SRC_ZIGBEE_ZCL_ZCL_CUSTOM_ATTR_H_
 
 #define REPEAT_COMMAND_OFF                                              0x00
 #define REPEAT_COMMAND_ON                                               0x01
@@ -16,4 +16,4 @@
 #define ZCL_TEMPERATURE_MEASUREMENT_ATTRID_ONOFF_REPEAT_COMMAND         0xF009
 
 
-#endif /* SRC_ZCL_ZCL_CUSTOM_ATTR_H_ */
+#endif /* SRC_ZIGBEE_ZCL_ZCL_CUSTOM_ATTR_H_ */

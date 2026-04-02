@@ -465,6 +465,7 @@ void app_zclIdentifyTimerStop(void)
  */
 void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime)
 {
+    APP_DEBUG(DEBUG_ZCL_APP_EN, "app_zclIdentifyCmdHandler, ep: %d, time: %d\r\n", endpoint, identifyTime);
 	g_zcl_identifyAttrs.identifyTime = identifyTime;
 
 	if(identifyTime == 0){
@@ -527,8 +528,8 @@ static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
  *
  * @return  None
  */
-static void app_zclIdentifyQueryRspCmdHandler(uint8_t endpoint, uint16_t srcAddr, zcl_identifyRspCmd_t *identifyRsp)
-{
+static void app_zclIdentifyQueryRspCmdHandler(uint8_t endpoint, uint16_t srcAddr, zcl_identifyRspCmd_t *identifyRsp) {
+    APP_DEBUG(DEBUG_ZCL_APP_EN, "app_zclIdentifyQueryRspCmdHandler\r\n");
 #if FIND_AND_BIND_SUPPORT
 	if(identifyRsp->timeout){
 		findBindDst_t dstInfo;
@@ -551,9 +552,10 @@ static void app_zclIdentifyQueryRspCmdHandler(uint8_t endpoint, uint16_t srcAddr
  *
  * @return  status_t
  */
-status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
-{
-	if(pAddrInfo->dstEp == APP_ENDPOINT1){
+status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
+    APP_DEBUG(DEBUG_ZCL_APP_EN, "app_identifyCb, ep: %d, dirCluster: %d, cmd: 0x%02x\r\n", pAddrInfo->dstEp, pAddrInfo->dirCluster, cmdId);
+
+	if(pAddrInfo->dstEp == APP_ENDPOINT1 || pAddrInfo->dstEp == APP_ENDPOINT2){
 		if(pAddrInfo->dirCluster == ZCL_FRAME_CLIENT_SERVER_DIR){
 			switch(cmdId){
 				case ZCL_CMD_IDENTIFY:
