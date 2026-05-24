@@ -76,52 +76,63 @@
 
 <img src="doc/images/reporting.jpg"/>
 
-## Как обновить.
+## Как обновить. 
+<details>
+    <summary>Раскрыть</summary>
 
-Сначала подключаем к `zigbee2mqtt` один внешний [конвертор](zigbee2mqtt/ts0201_tz3000_orig.js). Он активирует OTA в `zigbee2mqtt` для датчика с прошивкой от Tuya. Конвертор `ts0201_tz3000_orig.js` кладем в директорию `external_converters`, которую нужно создать в корне `zigbee2mqtt` (корнем нужно считать ту директорию, где лежит конфигурационный файл `configuration.yaml` от `zigbee2mqtt`).
+<div align="center"> 
 
-Далее нужно добавить локальное хранилище обновлений. 
+<a>В таблице приведены файлы и метод обновления для каждого датчика</a>
 
-Создаем директорию `images` в директории `zigbee2mqtt` и кладем туда файл [1141-d3a3-1111114b-ts0201_tz3000_0x15_zed.zigbee](bin/1141-d3a3-1111114b-ts0201_tz3000_0x15_zed.zigbee) для - `TS0201 _TZ3000_xr3htd96`, `TS0201 _TZ3000_fllyghyj`, `TS0201 _TZ3000_0s1izerx`. И копируем в директорию `zigbee2mqtt` файл [_TZ3000_xr3htd96/local_ota_index.json](zigbee2mqtt/_TZ3000_xr3htd96/local_ota_index.json)
+| Custom Zigbee Model | Original Zigbee Model | Z2M Model | Original Zigbee Manufacturer | Update method |
+|:-------------------:|:---------------------:|:---------:|:----------------------------:|:-------------:|
+| TS0201-z-SlD<br>TS0201-z15-SlD | TS0201 | [WSD500A](https://www.zigbee2mqtt.io/devices/WSD500A.html) | _TZ3000_xr3htd96<br>_TZ3000_fllyghyj<br>_TZ3000_0s1izerx | [OTA file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/1141-d3a3-1111114b-ts0201_tz3000_0x15_zed.zigbee) |
+| TS0201-z21-SlD     | TS0201 | [IH-K009](https://www.zigbee2mqtt.io/devices/IH-K009.html) | _TZ3000_dowj6gyi | [OTA file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/1141-d3a3-1111114b-ts0201_tz3000_0x21_zed.zigbee) |
+| TS0201-z22-SlD     | TS0201 | [ZY-ZTH02](https://www.zigbee2mqtt.io/devices/ZY-ZTH02.html) | Zbeacon | [OTA file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/1286-0202-1111114b-ts0201_tz3000_0x22_zed.zigbee) |
+| TS0201-z23-SlD     | TS0201 | [ZG-227Z](https://www.zigbee2mqtt.io/devices/ZG-227Z.html) | HOBEIAN | [BIN file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/ts0201_tz3000_0x23_zed_last_version.bin) |
+| TS0201-z24-SlD     | TH01 | [TH01](https://www.zigbee2mqtt.io/devices/TH01.html) | Zbeacon | [OTA file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/1286-0202-1111114b-ts0201_tz3000_0x24_zed.zigbee) |
+| TS0201-z28-SlD     | TS0201 | [TS0201](https://www.zigbee2mqtt.io/devices/TS0201.html#tuya-ts0201) | _TZ3000_stw9kdvl | [OTA file](https://github.com/slacky1965/ts0201_tz3000_zed/raw/refs/heads/main/bin/1141-d3a3-1111114b-ts0201_tz3000_0x28_zed.zigbee) |
 
-Для `TS0201 _TZ3000_dowj6gyi` кладем другой файл [1141-d3a3-1111114b-ts0201_tz3000_0x21_zed.zigbee](bin/1141-d3a3-1111114b-ts0201_tz3000_0x21_zed.zigbee) и копируем в директорию `zigbee2mqtt` файл [_TZ3000_dowj6gyi/local_ota_index.json](zigbee2mqtt/_TZ3000_dowj6gyi/local_ota_index.json)
+</div>
 
-Для `TS0201 Zbeacon`  кладем другой файл [1286-0202-1111114b-ts0201_tz3000_0x22_zed.zigbee](bin/1286-0202-1111114b-ts0201_tz3000_0x22_zed.zigbee) и копируем в директорию `zigbee2mqtt` файл [Zbeacon/local_ota_index.json](zigbee2mqtt/Zbeacon/local_ota_index.json)
+### Для датчиков, поддержавиющих обновление OTA
 
- Для `ZG-227Z HOBEIAN` ничего никуда класть не нужно. У этого датчика в оригинальной прошивке не реализована OTA. К сожалению его можно прошить только по проводам через `USB-UART` адаптер. Как это сделать читать [тут](ZG227ZS.md). 
+`zigbee2mqtt` нужно переключиться в новый интерфейс - `zigbee2mqtt-windfront`.
 
-Для `TH01 Zbeacon`  кладем другой файл [1286-0202-1111114b-ts0201_tz3000_0x24_zed.zigbee](bin/1286-0202-1111114b-ts0201_tz3000_0x24_zed.zigbee) и копируем в директорию `zigbee2mqtt` файл [TH01_Zbeacon/local_ota_index.json](zigbee2mqtt/TH01_Zbeacon/local_ota_index.json)
+Итак, скачиваем из репозитория нужный файл обновления (какой именно смотрите в таблице вверху). Заходим в устройство. И справа видим в `Firmware version` значок облака. Нам сюда.
 
-В конфиг `zigbee2mqtt` `configuration.yaml` добавляем локальное хранилище
+<img src="doc/images/z2m-ota_device.jpg"/>
 
-```
-ota:
-  zigbee_ota_override_index_location: local_ota_index.json
-```
+Далее выбираем `Custom firmware` из вываливающегося списка.
 
-Далее перегружаем `zigbee2mqtt`. И видим у нас новое устройство.
+<img src="doc/images/z2m-ota_custom_firmware.jpg"/>
 
-<img src="doc/images/tuya_ready.jpg"/>
+После этого выбираем файл.
 
-Далее идем в раздел OTA. И видим там свое устройство. Жмем проверить обновления.
+<img src="doc/images/z2m-ota_file_selection.jpg"/>
 
-<img src="doc/images/update.jpg"/>
-	
-Жмем на появившуюся красную кнопку. И обновляемся.
+Далее нажимаем кнопку на датчике, т.е. будим его и жмем обновить.
 
-Если все не так, как описано, значит вы что-то сделали не по инструкции (не положили файл куда нужно, не перегрузили `zigbee2mqtt`) или сигнатуры вашего датчика нет в списке поддерживаемых устройств.
+<img src="doc/images/z2m-ota_update.jpg"/>
 
-> [!WARNING]
-> Внимание!!! Если в процессе вы обнаружите на каких-то устройствах Туя, которые возможно у вас есть еще в системе, новое обновление, то обновлять ничего не нужно!!! Иначе вы зальете в это устройство прошивку от датчика и получите кирпич!!! Если же процесс обновления по ошибке уже начался, то просто обесточьте это устройство!!!
+Чтобы понять, пошло обновление или нет, возвращаемя в пункт `Devices` и смотрим на изображение датчика, там должен появиться вращающийся кружок со стрелками.
 
-Далее ждем окончания.
+<img src="doc/images/z2m-ota_process.jpg"/>
 
-После обновления нужно удалить устройство из `zigbee2mqtt`. Перегрузить `zigbee2mqtt`. Разрешить сопряжение. Зажать кнопку на 5 секунд, пока светодиод не начнет моргать и отпустить. Начнется сопряжение.
+Ну и еще это все будет фиксироваться в логе.
 
-<img src="doc/images/joined.jpg"/>
+<img src="doc/images/z2m-ota_log.jpg"/>
 
-Все, датчик готов к работе.
+После завершения обновления датчик готов к спариванию, нужно только разрешить это в `zigbee2mqtt`. Старую версию датчика просто удаляем. 
 
+### Для датчиков, не поддержавиющих обновление OTA
+
+Как залить прошивку можно почитать [тут](https://github.com/pvvx/ATC_MiThermometer?tab=readme-ov-file#the-usb-com-adapter-writes-the-firmware-in-explorer-web-version). 
+ 
+Зайдите на страницу [USBCOMFlashTx.html](https://pvvx.github.io/ATC_MiThermometer/USBCOMFlashTx.html). Назначьте порт - `Open`. Нажмите на кнопку на датчике, светодиод должен моргнуть. Далее нажмите `Erase All Flash`. Когда в логе отразится, что очистка завершена, снова нажмите на кнопку. Светодитод не должен моргать. Если он моргнет, значит вы ничего не стерли - проверьте подключение. Если не моргает, значит все хорошо. Выберите файл, например `ts0201_tz3000_0x23_zed_last_version.bin` для датчика с номером `23`. И нажмите `Write to Flash`. 
+
+   </details>
+   
 ## Параметры устройства.
 
 - **Battery** - емкость батарейки в %.
