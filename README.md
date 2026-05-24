@@ -76,6 +76,50 @@
 
 <img src="doc/images/reporting.jpg"/>
 
+## Как обновить. 
+<details>
+    <summary>Раскрыть</summary>
+
+<div align="center"> 
+<a>В таблице приведены файлы для каждого датчика</a>
+
+| Custom Zigbee Model | Original Zigbee Model | Z2M Model | Original Zigbee Manufacturer | Update method |
+|:-------------------:|:---------------------:|:---------:|:----------------------------:|:-------------:|
+| TS0201-z-SlD<br>TS0201-z15-SlD | TS0201 | TS0201 | _TZ3000_xr3htd96<br>_TZ3000_fllyghyj<br>_TZ3000_0s1izerx | OTA file |
+| TS0201-z21-SlD     | TS0201 | TS0201 | _TZ3000_dowj6gyi | OTA file |
+
+</div>
+
+`zigbee2mqtt` нужно переключиться в новый интерфейс - `zigbee2mqtt-windfront`.
+
+Итак, скачиваем из репозитория нужный файл обновления (какой именно смотрите в вверху). Заходим в устройство. И справа видим в `Firmware version` значок облака. Нам сюда.
+
+<img src="doc/images/z2m-ota_device.jpg"/>
+
+Далее выбираем `Custom firmware` из вываливающегося списка.
+
+<img src="doc/images/z2m-ota_custom_firmware.jpg"/>
+
+После этого выбираем файл.
+
+<img src="doc/images/z2m-ota_file_selection.jpg"/>
+
+Далее нажимаем кнопку на выключателе, т.е. будим его и жмем обновить.
+
+<img src="doc/images/z2m-ota_update.jpg"/>
+
+Чтобы понять, пошло обновление или нет, смотрим на изображение выключателя, там должен появиться вращающийся кружок со стрелками. И в `Recent activity` будет отображаться оставшееся время в секундах и сколько загрузили в процентах.
+
+<img src="doc/images/z2m-ota_process.jpg"/>
+
+Ну и еще это все будет фиксироваться в логе.
+
+<img src="doc/images/z2m-ota_log.jpg"/>
+
+После завершения обновления выключатель готов к спариванию, нужно только разрешить это в `zigbee2mqtt`. Старую версию выключателя просто удаляем. 
+
+   </details>
+   
 ## Как обновить.
 
 Сначала подключаем к `zigbee2mqtt` один внешний [конвертор](zigbee2mqtt/ts0201_tz3000_orig.js). Он активирует OTA в `zigbee2mqtt` для датчика с прошивкой от Tuya. Конвертор `ts0201_tz3000_orig.js` кладем в директорию `external_converters`, которую нужно создать в корне `zigbee2mqtt` (корнем нужно считать ту директорию, где лежит конфигурационный файл `configuration.yaml` от `zigbee2mqtt`).
