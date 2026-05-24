@@ -75,7 +75,7 @@ INCLUDE_PATHS := \
 -I$(SRC_PATH)/include \
 -I$(SRC_PATH)/common \
 -I$(SRC_PATH)/sensors \
--I$(SRC_PATH)/zcl
+-I$(SRC_PATH)/zigbee/zcl
  
 
 LS_FLAGS := $(SDK_PATH)/platform/boot/8258/boot_8258.link
@@ -100,10 +100,13 @@ GCC_FLAGS += \
 -DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
 endif
   
+DEBUG ?= "-DUART_PRINTF_MODE=ON"
+
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
-$(PROJECT_DEF)
+$(PROJECT_DEF) \
+$(DEBUG)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -156,8 +159,8 @@ all: pre-build main-build
 flash8000: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 
-flash0: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
+flash0:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 
 erase-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s ea
@@ -236,8 +239,9 @@ clean-project:
 	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/sensors/*.o
-	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zcl/*.o
-	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zdo/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/zcl/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/zdo/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/zigbee/bdb/*.o
 	-@echo ' '
 	
 pre-build:

@@ -147,16 +147,18 @@ _START:
     la     t0, _STACK_TOP
     mv     sp, t0
 
-#if 1
-    /* gpio shutdown to decrease current. for power on or deep this function was in flash code segment. */
-    la     t0, gpio_shutdown_flashcode_for_asm
-    jalr   t0
-#endif
-
+    /* This code should be placed before the following gpio_shutdown_flashcode_for_asm interface because 
+    when using the Os compilation option, the gpio_shutdown_flashcode_for_asm will use the EXEC.IT table. */
 #ifdef __nds_execit
     /* Initialize EXEC.IT table */
     la t0, _ITB_BASE_
     csrw uitb, t0
+#endif
+
+#if 1
+    // Call gpio shutdown to decrease current as soon as possible when power on or wake up from deep sleep.
+    la     t0, gpio_shutdown_flashcode_for_asm
+    jalr   t0
 #endif
 
 #ifdef __riscv_flen
@@ -192,16 +194,16 @@ _RETENTION_RESET_INIT:
     la     t2, _RETENTION_RESET_VMA_START
     la     t3, _RETENTION_RESET_VMA_END
 _RETENTION_RESET_BEGIN:
-    bleu    t3, t2, _RAMCODE_INIT
+    bleu   t3, t2, _RETENTION_DATA_INIT
     lw     t0, 0(t1)
     sw     t0, 0(t2)
     addi   t1, t1, 4
     addi   t2, t2, 4
     j      _RETENTION_RESET_BEGIN
 
-#if 0
     /* Move retention from flash to sram */
 _RETENTION_DATA_INIT:
+#if 0
     la     t1, _RETENTION_DATA_LMA_START
     la     t2, _RETENTION_DATA_VMA_START
     la     t3, _RETENTION_DATA_VMA_END
@@ -340,16 +342,18 @@ _ISTART:
     la     t0, _STACK_TOP
     mv     sp, t0
 
-#if 1
-    /* gpio shutdown to decrease current. for retention this function was in ram segment which can be called early. */
-    la     t0, gpio_shutdown_ramcode_for_asm
-    jalr   t0
-#endif
-
+    /* This code should be placed before the following gpio_shutdown_ramcode_for_asm interface because 
+    when using the Os compilation option, the gpio_shutdown_ramcode_for_asm will use the EXEC.IT table. */
 #ifdef __nds_execit
     /* Initialize EXEC.IT table */
     la t0, _ITB_BASE_
     csrw uitb, t0
+#endif
+
+#if 1
+    /* gpio shutdown to decrease current. for retention this function was in ram segment which can be called early. */
+    la     t0, gpio_shutdown_ramcode_for_asm
+    jalr   t0
 #endif
 
 #ifdef __riscv_flen
@@ -418,7 +422,7 @@ _MSPI_WAIT_2:
     sb      t1, 0x78c(t0)       //xip_enable        :0xA3FFFF1c = 0x0a
 
     /*flash wakeup need delay about 20us */
-    /*efuse load need delay about 0us */
+    /*efuse load need delay about 6us */
     li      t0, 0
     li      t1, EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM
 _WAIT_EFUSE_LOAD_AND_FLASH_WAKEUP_FINISH:

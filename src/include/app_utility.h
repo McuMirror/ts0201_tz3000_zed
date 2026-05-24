@@ -12,6 +12,7 @@
 
 /* for TL_ZB_TIMER_SCHEDULE() */
 #define TIMEOUT_10MS               10       /* timeout 10  ms   */
+#define TIMEOUT_50MS               50       /* timeout 50  ms   */
 #define TIMEOUT_100MS              100      /* timeout 100 ms   */
 #define TIMEOUT_250MS              250      /* timeout 250 ms   */
 #define TIMEOUT_500MS              500      /* timeout 900 ms   */
@@ -25,15 +26,29 @@
 #define TIMEOUT_15SEC       15   * 1000     /* timeout 15 sec   */
 #define TIMEOUT_20SEC       20   * 1000     /* timeout 20 sec   */
 #define TIMEOUT_30SEC       30   * 1000     /* timeout 30 sec   */
-#define TIMEOUT_1MIN30SEC   90   * 1000     /* timeout 1.5 min  */
 #define TIMEOUT_1MIN        60   * 1000     /* timeout 1 min    */
+#define TIMEOUT_1MIN30SEC   90   * 1000     /* timeout 1.5 min  */
 #define TIMEOUT_2MIN        120  * 1000     /* timeout 2 min    */
+#define TIMEOUT_3MIN        180  * 1000     /* timeout 3 min    */
 #define TIMEOUT_5MIN        300  * 1000     /* timeout 5 min    */
 #define TIMEOUT_10MIN       600  * 1000     /* timeout 10 min   */
 #define TIMEOUT_15MIN       900  * 1000     /* timeout 15 min   */
 #define TIMEOUT_30MIN       1800 * 1000     /* timeout 30 min   */
 #define TIMEOUT_60MIN       3600 * 1000     /* timeout 60 min   */
 #define TIMEOUT_2HOUR       7200 * 1000     /* timeout 2 hour   */
+
+#if (UART_PRINTF_MODE || USB_PRINTF_MODE)
+#define APP_DEBUG(compileFlag, ...)             do{ \
+                                                    if(compileFlag) { \
+                                                        uint32_t r = drv_disable_irq(); \
+                                                        TRACE(__VA_ARGS__); \
+                                                        drv_restore_irq(r); \
+                                                    } \
+                                                }while(0)
+
+#else
+    #define APP_DEBUG(compileFlag, ...)
+#endif
 
 void start_message();
 int32_t poll_rateAppCb(void *arg);

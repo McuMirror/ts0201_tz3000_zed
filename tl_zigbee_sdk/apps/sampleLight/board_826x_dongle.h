@@ -22,7 +22,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-
 #pragma once
 
 /* Enable C linkage for C++ Compilers: */
@@ -30,188 +29,202 @@
 extern "C" {
 #endif
 
-//KEY
-#define	BUTTON1 					GPIO_PD2
-#define PD2_FUNC					AS_GPIO
-#define PD2_OUTPUT_ENABLE			0
-#define PD2_INPUT_ENABLE			1
-#define	PULL_WAKEUP_SRC_PD2			PM_PIN_PULLUP_10K
+/***************************************************************/
+/* RGB or CCT or Brightness */
+#define COLOR_RGB_SUPPORT       0
+#define COLOR_CCT_SUPPORT       1//0
+#define BRIGHTNESS_SUPPORT      0
 
-#define	BUTTON2 					GPIO_PC5
-#define PC5_FUNC					AS_GPIO
-#define PC5_OUTPUT_ENABLE			0
-#define PC5_INPUT_ENABLE			1
-#define	PULL_WAKEUP_SRC_PC5			PM_PIN_PULLUP_10K
+#if COLOR_RGB_SUPPORT && COLOR_CCT_SUPPORT
+#error "Not Support"
+#elif COLOR_RGB_SUPPORT
+#define COLOR_X_Y_DISABLE       1
+#endif
+/***************************************************************/
+
+//KEY
+#define	BUTTON1                 GPIO_PD2
+#define PD2_FUNC                AS_GPIO
+#define PD2_OUTPUT_ENABLE       0
+#define PD2_INPUT_ENABLE        1
+#define	PULL_WAKEUP_SRC_PD2     PM_PIN_PULLUP_10K
+
+#define	BUTTON2                 GPIO_PC5
+#define PC5_FUNC                AS_GPIO
+#define PC5_OUTPUT_ENABLE       0
+#define PC5_INPUT_ENABLE        1
+#define	PULL_WAKEUP_SRC_PC5     PM_PIN_PULLUP_10K
 
 //LED
 /***************************************************************
-* LED_R		GPIO_PC2	//D3 -- red			PWM2
-* LED_G		GPIO_PC3	//D1 -- green		PWM3
-* LED_B		GPIO_PB6	//D2 -- blue		PWM5
-* LED_W		GPIO_PB4	//D4 -- white		PWM4
+* LED_R	        GPIO_PC2        //D3 -- red     PWM2
+* LED_G	        GPIO_PC3        //D1 -- green   PWM3
+* LED_B	        GPIO_PB6        //D2 -- blue    PWM5
+* LED_W	        GPIO_PB4        //D4 -- white   PWM4
 ****************************************************************/
-#if defined COLOR_RGB_SUPPORT && (COLOR_RGB_SUPPORT == 1)
-#define PC2_FUNC					AS_PWM
-#define PC2_OUTPUT_ENABLE			1
-#define PC2_INPUT_ENABLE			0
+#if defined(COLOR_RGB_SUPPORT) && (COLOR_RGB_SUPPORT == 1)
+#define PC2_FUNC                AS_PWM
+#define PC2_OUTPUT_ENABLE       1
+#define PC2_INPUT_ENABLE        0
 
-#define PC3_FUNC					AS_PWM
-#define PC3_OUTPUT_ENABLE			1
-#define PC3_INPUT_ENABLE			0
+#define PC3_FUNC                AS_PWM
+#define PC3_OUTPUT_ENABLE       1
+#define PC3_INPUT_ENABLE        0
 
-#define PB6_FUNC					AS_PWM
-#define PB6_OUTPUT_ENABLE			1
-#define PB6_INPUT_ENABLE			0
+#define PB6_FUNC                AS_PWM
+#define PB6_OUTPUT_ENABLE       1
+#define PB6_INPUT_ENABLE        0
 
-#define PWM_R_CHANNEL_SET()			PWM2_CFG_GPIO_C2()
-#define PWM_R_CHANNEL				2//PWM2
+#define PWM_R_CHANNEL_SET()     PWM2_CFG_GPIO_C2()
+#define PWM_R_CHANNEL           2//PWM2
 
-#define PWM_G_CHANNEL_SET()			PWM3_CFG_GPIO_C3()
-#define PWM_G_CHANNEL				3//PWM3
+#define PWM_G_CHANNEL_SET()     PWM3_CFG_GPIO_C3()
+#define PWM_G_CHANNEL           3//PWM3
 
-#define PWM_B_CHANNEL_SET()			PWM5_CFG_GPIO_B6()
-#define PWM_B_CHANNEL				5//PWM5
+#define PWM_B_CHANNEL_SET()     PWM5_CFG_GPIO_B6()
+#define PWM_B_CHANNEL           5//PWM5
 
-#define R_LIGHT_PWM_CHANNEL			PWM_R_CHANNEL
-#define G_LIGHT_PWM_CHANNEL			PWM_G_CHANNEL
-#define B_LIGHT_PWM_CHANNEL			PWM_B_CHANNEL
-#define R_LIGHT_PWM_SET()			PWM_R_CHANNEL_SET()
-#define G_LIGHT_PWM_SET()			PWM_G_CHANNEL_SET()
-#define B_LIGHT_PWM_SET()			PWM_B_CHANNEL_SET()
+#define R_LIGHT_PWM_CHANNEL     PWM_R_CHANNEL
+#define G_LIGHT_PWM_CHANNEL     PWM_G_CHANNEL
+#define B_LIGHT_PWM_CHANNEL     PWM_B_CHANNEL
+#define R_LIGHT_PWM_SET()       PWM_R_CHANNEL_SET()
+#define G_LIGHT_PWM_SET()       PWM_G_CHANNEL_SET()
+#define B_LIGHT_PWM_SET()       PWM_B_CHANNEL_SET()
 
 //Others as GPIO.
-#define LED_W						GPIO_PB4
+#define LED_W                   GPIO_PB4
 
-#define PB4_FUNC					AS_GPIO
-#define PB4_OUTPUT_ENABLE			1
-#define PB4_INPUT_ENABLE			0
+#define PB4_FUNC                AS_GPIO
+#define PB4_OUTPUT_ENABLE       1
+#define PB4_INPUT_ENABLE        0
 
-#define LED_POWER					LED_W
-#define LED_PERMIT					LED_W
-#elif defined COLOR_CCT_SUPPORT && (COLOR_CCT_SUPPORT == 1)
+#define LED_POWER               LED_W
+#define LED_PERMIT              LED_W
+#elif defined(COLOR_CCT_SUPPORT) && (COLOR_CCT_SUPPORT == 1)
 //PWM configuration, LED_B as warm light, LED_W as cool light.
-#define PB6_FUNC					AS_PWM
-#define PB6_OUTPUT_ENABLE			1
-#define PB6_INPUT_ENABLE			0
+#define PB6_FUNC                AS_PWM
+#define PB6_OUTPUT_ENABLE       1
+#define PB6_INPUT_ENABLE        0
 
-#define PB4_FUNC					AS_PWM
-#define PB4_OUTPUT_ENABLE			1
-#define PB4_INPUT_ENABLE			0
+#define PB4_FUNC                AS_PWM
+#define PB4_OUTPUT_ENABLE       1
+#define PB4_INPUT_ENABLE        0
 
-#define PWM_B_CHANNEL_SET()			PWM5_CFG_GPIO_B6()
-#define PWM_B_CHANNEL				5//PWM5
+#define PWM_B_CHANNEL_SET()     PWM5_CFG_GPIO_B6()
+#define PWM_B_CHANNEL           5//PWM5
 
-#define PWM_W_CHANNEL_SET()			PWM4_CFG_GPIO_B4()
-#define PWM_W_CHANNEL				4//PWM4
+#define PWM_W_CHANNEL_SET()     PWM4_CFG_GPIO_B4()
+#define PWM_W_CHANNEL           4//PWM4
 
-#define WARM_LIGHT_PWM_CHANNEL		PWM_B_CHANNEL
-#define COOL_LIGHT_PWM_CHANNEL		PWM_W_CHANNEL
-#define WARM_LIGHT_PWM_SET()		PWM_B_CHANNEL_SET()
-#define COOL_LIGHT_PWM_SET()		PWM_W_CHANNEL_SET()
-
-//Others as GPIO.
-#define LED_R						GPIO_PC2
-#define LED_G						GPIO_PC3
-
-#define PC2_FUNC					AS_GPIO
-#define PC2_OUTPUT_ENABLE			1
-#define PC2_INPUT_ENABLE			0
-
-#define PC3_FUNC					AS_GPIO
-#define PC3_OUTPUT_ENABLE			1
-#define PC3_INPUT_ENABLE			0
-
-#define LED_POWER					LED_R
-#define LED_PERMIT					LED_G
-#elif defined ZCL_LEVEL_CTRL_SUPPORT && (ZCL_LEVEL_CTRL_SUPPORT == 1)
-#define PB4_FUNC					AS_PWM
-#define PB4_OUTPUT_ENABLE			1
-#define PB4_INPUT_ENABLE			0
-
-#define PWM_W_CHANNEL_SET()			PWM4_CFG_GPIO_B4()
-#define PWM_W_CHANNEL				4//PWM4
-
-#define COOL_LIGHT_PWM_CHANNEL		PWM_W_CHANNEL
-#define COOL_LIGHT_PWM_SET()		PWM_W_CHANNEL_SET()
+#define WARM_LIGHT_PWM_CHANNEL  PWM_B_CHANNEL
+#define COOL_LIGHT_PWM_CHANNEL  PWM_W_CHANNEL
+#define WARM_LIGHT_PWM_SET()    PWM_B_CHANNEL_SET()
+#define COOL_LIGHT_PWM_SET()    PWM_W_CHANNEL_SET()
 
 //Others as GPIO.
-#define LED_R						GPIO_PC2
-#define LED_G						GPIO_PC3
-#define LED_B						GPIO_PB6
+#define LED_R                   GPIO_PC2
+#define LED_G                   GPIO_PC3
 
-#define PC2_FUNC					AS_GPIO
-#define PC2_OUTPUT_ENABLE			1
-#define PC2_INPUT_ENABLE			0
+#define PC2_FUNC                AS_GPIO
+#define PC2_OUTPUT_ENABLE       1
+#define PC2_INPUT_ENABLE        0
 
-#define PC3_FUNC					AS_GPIO
-#define PC3_OUTPUT_ENABLE			1
-#define PC3_INPUT_ENABLE			0
+#define PC3_FUNC                AS_GPIO
+#define PC3_OUTPUT_ENABLE       1
+#define PC3_INPUT_ENABLE        0
 
-#define PB6_FUNC					AS_GPIO
-#define PB6_OUTPUT_ENABLE			1
-#define PB6_INPUT_ENABLE			0
+#define LED_POWER               LED_R
+#define LED_PERMIT              LED_G
+#elif defined(BRIGHTNESS_SUPPORT) && (BRIGHTNESS_SUPPORT == 1)
+#define PB4_FUNC                AS_PWM
+#define PB4_OUTPUT_ENABLE       1
+#define PB4_INPUT_ENABLE        0
 
-#define LED_POWER					LED_R
-#define LED_PERMIT					LED_G
+#define PWM_W_CHANNEL_SET()     PWM4_CFG_GPIO_B4()
+#define PWM_W_CHANNEL           4//PWM4
+
+#define COOL_LIGHT_PWM_CHANNEL  PWM_W_CHANNEL
+#define COOL_LIGHT_PWM_SET()    PWM_W_CHANNEL_SET()
+
+//Others as GPIO.
+#define LED_R                   GPIO_PC2
+#define LED_G                   GPIO_PC3
+#define LED_B                   GPIO_PB6
+
+#define PC2_FUNC                AS_GPIO
+#define PC2_OUTPUT_ENABLE       1
+#define PC2_INPUT_ENABLE        0
+
+#define PC3_FUNC                AS_GPIO
+#define PC3_OUTPUT_ENABLE       1
+#define PC3_INPUT_ENABLE        0
+
+#define PB6_FUNC                AS_GPIO
+#define PB6_OUTPUT_ENABLE       1
+#define PB6_INPUT_ENABLE        0
+
+#define LED_POWER               LED_R
+#define LED_PERMIT              LED_G
 #else
 //All LED as GPIO.
-#define LED_R						GPIO_PC2
-#define LED_G						GPIO_PC3
-#define LED_B						GPIO_PB6
-#define LED_W						GPIO_PB4
+#define LED_R                   GPIO_PC2
+#define LED_G                   GPIO_PC3
+#define LED_B                   GPIO_PB6
+#define LED_W                   GPIO_PB4
 
-#define PC2_FUNC					AS_GPIO
-#define PC2_OUTPUT_ENABLE			1
-#define PC2_INPUT_ENABLE			0
+#define PC2_FUNC                AS_GPIO
+#define PC2_OUTPUT_ENABLE       1
+#define PC2_INPUT_ENABLE        0
 
-#define PC3_FUNC					AS_GPIO
-#define PC3_OUTPUT_ENABLE			1
-#define PC3_INPUT_ENABLE			0
+#define PC3_FUNC                AS_GPIO
+#define PC3_OUTPUT_ENABLE       1
+#define PC3_INPUT_ENABLE        0
 
-#define PB6_FUNC					AS_GPIO
-#define PB6_OUTPUT_ENABLE			1
-#define PB6_INPUT_ENABLE			0
+#define PB6_FUNC                AS_GPIO
+#define PB6_OUTPUT_ENABLE       1
+#define PB6_INPUT_ENABLE        0
 
-#define PB4_FUNC					AS_GPIO
-#define PB4_OUTPUT_ENABLE			1
-#define PB4_INPUT_ENABLE			0
+#define PB4_FUNC                AS_GPIO
+#define PB4_OUTPUT_ENABLE       1
+#define PB4_INPUT_ENABLE        0
 
-#define COOL_LIGHT_GPIO				LED_W
+#define COOL_LIGHT_GPIO	        LED_W
 
-#define LED_POWER					LED_R
-#define LED_PERMIT					LED_G
+#define LED_POWER               LED_R
+#define LED_PERMIT              LED_G
 #endif
 
 //ADC
 #if VOLTAGE_DETECT_ENABLE
-#define VOLTAGE_DETECT_ADC_PIN		NOINPUT
+#define VOLTAGE_DETECT_ADC_PIN  NOINPUT
 #endif
 
 //UART
-#if	ZBHCI_UART
-	PC2 & PC3 are configured as LED pins
+#if ZBHCI_UART
+#warning "PC2 & PC3 are configured as LED pins"
 #endif
 
 //DEBUG
 #if UART_PRINTF_MODE
-#define	DEBUG_INFO_TX_PIN	    	GPIO_PB5//print
+#define	DEBUG_INFO_TX_PIN       GPIO_PB5//print
 #endif
 
 
-enum{
-	VK_SW1 = 0x01,
-	VK_SW2 = 0x02
+enum {
+    VK_SW1 = 0x01,
+    VK_SW2 = 0x02
 };
 
-#define	KB_MAP_NORMAL	{\
-		{VK_SW1,}, \
-		{VK_SW2,}, }
+#define	KB_MAP_NORMAL           { \
+                                    {VK_SW1,}, \
+                                    {VK_SW2,}, \
+                                }
 
-#define	KB_MAP_NUM		KB_MAP_NORMAL
-#define	KB_MAP_FN		KB_MAP_NORMAL
+#define	KB_MAP_NUM              KB_MAP_NORMAL
+#define	KB_MAP_FN               KB_MAP_NORMAL
 
-#define KB_DRIVE_PINS	{0}
-#define KB_SCAN_PINS	{BUTTON1, BUTTON2}
+#define KB_DRIVE_PINS           {0}
+#define KB_SCAN_PINS            {BUTTON1, BUTTON2}
 
 
 /* Disable C linkage for C++ Compilers: */

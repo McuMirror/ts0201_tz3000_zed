@@ -1,11 +1,16 @@
 #ifndef SRC_INCLUDE_APP_ENDPOINT_CFG_H_
 #define SRC_INCLUDE_APP_ENDPOINT_CFG_H_
 
-#define APP_ENDPOINT1 0x01
-#define APP_ENDPOINT2 0x02
-#define APP_ENDPOINT3 0x03
-#define APP_ENDPOINT4 0x04
-#define APP_ENDPOINT5 0x05
+enum {
+    APP_ENDPOINT1 = 0x01,
+    APP_ENDPOINT2
+};
+
+//#define APP_ENDPOINT1 0x01
+//#define APP_ENDPOINT2 0x02
+//#define APP_ENDPOINT3 0x03
+//#define APP_ENDPOINT4 0x04
+//#define APP_ENDPOINT5 0x05
 
 /**
  *  @brief Defined for basic cluster attributes

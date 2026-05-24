@@ -83,11 +83,16 @@ s32 app_bdbNetworkSteerStart(void *arg){
 }
 
 #if FIND_AND_BIND_SUPPORT
-s32 app_bdbFindAndBindStart(void *arg){
-	BDB_ATTR_GROUP_ID_SET(0x1234);//only for initiator
-	bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_INITIATOR);
+int32_t app_bdbFindAndBindStart(void *arg) {
+    APP_DEBUG(DEBUG_BDB_EN, "timer app_bdbFindAndBindStart\r\n");
+    _CODE_BDB_ u8 st = bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_INITIATOR);
+    APP_DEBUG(DEBUG_BDB_EN, "status: 0x%02x\r\n", st);
 
-	g_switchAppCtx.bdbFBTimerEvt = NULL;
+    if (st != BDB_STATE_IDLE) {
+        return 2500;
+    }
+
+	g_appCtx.bdbFBTimerEvt = NULL;
 	return -1;
 }
 #endif
@@ -203,12 +208,12 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 #ifdef ZCL_OTA
 			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
 #endif
-#if FIND_AND_BIND_SUPPORT
-			//start Finding & Binding
-			if(!g_switchAppCtx.bdbFBTimerEvt){
-				g_switchAppCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
-			}
-#endif
+//#if FIND_AND_BIND_SUPPORT
+//			//start Finding & Binding
+//			if(!g_appCtx.bdbFBTimerEvt){
+//			    g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 50);
+//			}
+//#endif
 
             if (g_appCtx.timerAppBindEvt) {
                 TL_ZB_TIMER_CANCEL(&g_appCtx.timerAppBindEvt);
@@ -288,7 +293,7 @@ void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo){
 	dstEpInfo.dstEp = pDstInfo->endpoint;
 	dstEpInfo.profileId = HA_PROFILE_ID;
 
-	zcl_identify_identifyCmd(SAMPLE_SWITCH_ENDPOINT, &dstEpInfo, FALSE, 0, 0);
+	zcl_identify_identifyCmd(APP_ENDPOINT1, &dstEpInfo, FALSE, 0, 0);
 #endif
 }
 

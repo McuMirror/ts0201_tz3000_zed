@@ -66,18 +66,23 @@
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                OFF
+#ifndef UART_PRINTF_MODE
+#define UART_PRINTF_MODE                ON
+#endif
 #define USB_PRINTF_MODE                 OFF
 
-#define DEBUG_BUTTON                    ON
-#define DEBUG_REPORTING                 OFF
-#define DEBUG_BATTERY                   OFF
-#define DEBUG_PM                        OFF
+#define DEBUG_BUTTON_EN                 ON
+#define DEBUG_REPORTING_EN              OFF
+#define DEBUG_BATTERY_EN                OFF
+#define DEBUG_PM_EN                     OFF
 #define DEBUG_OTA                       OFF
-#define DEBUG_SENSOR                    ON
+#define DEBUG_SENSOR_EN                 OFF
 #define DEBUG_STA_STATUS                OFF
-#define DEBUG_SAVE                      ON
-#define DEBUG_ONOFF                     ON
+#define DEBUG_SAVE_EN                   ON
+#define DEBUG_ONOFF_EN                  ON
+#define DEBUG_ZCL_APP_EN                ON
+#define DEBUG_BDB_EN                    ON
+
 /* PM */
 #define PM_ENABLE                       ON
 
@@ -86,7 +91,7 @@
 
 /* BDB */
 #define TOUCHLINK_SUPPORT               ON
-#define FIND_AND_BIND_SUPPORT           OFF
+#define FIND_AND_BIND_SUPPORT           ON
 
 /* Board define */
 #if defined(MCU_CORE_826x)
@@ -122,6 +127,7 @@
 #include "board_zbeacon.h"
 #include "board_zg_227zs.h"
 #include "board_th01_zbeacon.h"
+#include "board_z_wxd.h"
 #endif
 
 /* Voltage detect module */

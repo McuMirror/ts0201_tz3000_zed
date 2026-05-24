@@ -1,5 +1,7 @@
 #include "app_main.h"
 
+static ev_timer_event_t *findbindTimerEvt = NULL;
+
 static int32_t net_steer_start_offCb(void *args) {
 
     g_appCtx.net_steer_start = false;
@@ -9,14 +11,18 @@ static int32_t net_steer_start_offCb(void *args) {
     return -1;
 }
 
+static int32_t find_and_bind_clear_flag(void *args) {
+
+    g_appCtx.find_bind_flag = false;
+    return -1;
+}
+
 static void buttonKeepPressed(u8 btNum) {
     g_appCtx.button[btNum-1].state = APP_FACTORY_NEW_DOING;
     g_appCtx.button[btNum-1].ctn = 0;
 
     if(btNum == VK_SW1) {
-#if UART_PRINTF_MODE && DEBUG_BUTTON
-        printf("The button was keep pressed for 5 seconds\r\n");
-#endif
+        APP_DEBUG(DEBUG_BUTTON_EN, "The button was keep pressed for 5 seconds\r\n");
 
 
         zb_factoryReset();
@@ -33,9 +39,7 @@ static void buttonSinglePressed(u8 btNum) {
 
     switch (btNum) {
         case VK_SW1:
-#if UART_PRINTF_MODE && DEBUG_BUTTON
-            printf("Button push 1 time\r\n");
-#endif
+            APP_DEBUG(DEBUG_BUTTON_EN, "Button push 1 time\r\n");
             if(zb_isDeviceJoinedNwk()) {
                 app_setPollRate(TIMEOUT_20SEC);
                 TL_ZB_TIMER_SCHEDULE(forcedReportCb, NULL, TIMEOUT_100MS);
@@ -53,17 +57,127 @@ static void buttonSinglePressed(u8 btNum) {
     }
 }
 
-//static void buttonDoublePressed(u8 btNum) {
-//    printf("Command double click\r\n");
-//}
-//
-//static void buttonTriplePressed(u8 btNum) {
-//    printf("Command triple click\r\n");
-//}
-//
-//static void buttonQuadruplePressed(u8 btNum) {
-//    printf("Command quadruple click\r\n");
-//}
+/* find&bind temperature, humidity, battery with endpoint 1 */
+static void buttonDoublePressed(u8 btNum) {
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 2 times\r\n");
+    aps_binding_entry_t *bind_tbl = aps_bindingTblEntryGet();
+    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+        if (bind_tbl->used && bind_tbl->srcEp == APP_ENDPOINT1 &&
+                (bind_tbl->clusterId == ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT ||
+                bind_tbl->clusterId == ZCL_CLUSTER_MS_RELATIVE_HUMIDITY ||
+                bind_tbl->clusterId == ZCL_CLUSTER_GEN_POWER_CFG)) {
+            if (memcmp(bind_tbl->dstExtAddrInfo.extAddr, get_ieee_coordinator(), 8)) {
+                APP_DEBUG(DEBUG_ONOFF_EN, "Deleted src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+                        bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+                        bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                        bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                        bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                        bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+                bind_tbl->used = false;
+            }
+        }
+        bind_tbl++;
+    }
+    if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.find_bind_src_ep = APP_ENDPOINT1;
+        g_appCtx.find_bind_flag = true;
+        g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, TIMEOUT_50MS);
+        if (!findbindTimerEvt) {
+            TL_ZB_TIMER_CANCEL(&findbindTimerEvt);
+        }
+        findbindTimerEvt = TL_ZB_TIMER_SCHEDULE(find_and_bind_clear_flag, NULL, TIMEOUT_3MIN);
+    }
+}
+
+/* find&bind onoff with endpoint 1 */
+static void buttonTriplePressed(u8 btNum) {
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 3 times\r\n");
+    aps_binding_entry_t *bind_tbl = aps_bindingTblEntryGet();
+    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+        if (bind_tbl->used && bind_tbl->srcEp == APP_ENDPOINT1 && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+            if (memcmp(bind_tbl->dstExtAddrInfo.extAddr, get_ieee_coordinator(), 8)) {
+                APP_DEBUG(DEBUG_ONOFF_EN, "Deleted src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+                        bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+                        bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                        bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                        bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                        bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+                bind_tbl->used = false;
+            }
+        }
+        bind_tbl++;
+    }
+    if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.find_bind_src_ep = APP_ENDPOINT1;
+        g_appCtx.find_bind_flag = true;
+        g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, TIMEOUT_50MS);
+        if (!findbindTimerEvt) {
+            TL_ZB_TIMER_CANCEL(&findbindTimerEvt);
+        }
+        findbindTimerEvt = TL_ZB_TIMER_SCHEDULE(find_and_bind_clear_flag, NULL, TIMEOUT_3MIN);
+    }
+}
+
+/* find&bind onoff with endpoint 2 */
+static void buttonQuadruplePressed(u8 btNum) {
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 4 times\r\n");
+    aps_binding_entry_t *bind_tbl = aps_bindingTblEntryGet();
+    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+        if (bind_tbl->used && bind_tbl->srcEp == APP_ENDPOINT2 && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+            if (memcmp(bind_tbl->dstExtAddrInfo.extAddr, get_ieee_coordinator(), 8)) {
+                APP_DEBUG(DEBUG_ONOFF_EN, "Deleted src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+                        bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+                        bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                        bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                        bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                        bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+                bind_tbl->used = false;
+            }
+        }
+        bind_tbl++;
+    }
+    if (!g_appCtx.bdbFBTimerEvt) {
+        g_appCtx.find_bind_src_ep = APP_ENDPOINT2;
+        g_appCtx.find_bind_flag = true;
+        g_appCtx.bdbFBTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, TIMEOUT_50MS);
+        if (!findbindTimerEvt) {
+            TL_ZB_TIMER_CANCEL(&findbindTimerEvt);
+        }
+        findbindTimerEvt = TL_ZB_TIMER_SCHEDULE(find_and_bind_clear_flag, NULL, TIMEOUT_3MIN);
+    }
+}
+
+static void buttonQuintuplePressed(u8 btNum) {
+//    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 5 times\r\n");
+//    aps_binding_entry_t *bind_tbl = bindTblEntryGet();
+//    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+//        if (bind_tbl->used && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+//            APP_DEBUG(DEBUG_ONOFF_EN, "src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+//                    bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+//                    bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+//                    bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+//                    bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+//                    bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+//        }
+//        bind_tbl++;
+//    }
+    APP_DEBUG(DEBUG_BUTTON_EN, "Button push 5 times\r\n");
+    aps_binding_entry_t *bind_tbl = aps_bindingTblEntryGet();
+    for (uint8_t i = 0; i < APS_BINDING_TABLE_NUM; i++) {
+        if (bind_tbl->used && bind_tbl->clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
+            if (memcmp(bind_tbl->dstExtAddrInfo.extAddr, get_ieee_coordinator(), 8)) {
+                APP_DEBUG(DEBUG_ONOFF_EN, "Deleted src_ep: %d, dst_ep: %d, ieee: 0x%02x%02x%02x%02x%02x%02x%02x%02x\r\n",
+                        bind_tbl->srcEp, bind_tbl->dstExtAddrInfo.dstEp,
+                        bind_tbl->dstExtAddrInfo.extAddr[0], bind_tbl->dstExtAddrInfo.extAddr[1],
+                        bind_tbl->dstExtAddrInfo.extAddr[2], bind_tbl->dstExtAddrInfo.extAddr[3],
+                        bind_tbl->dstExtAddrInfo.extAddr[4], bind_tbl->dstExtAddrInfo.extAddr[5],
+                        bind_tbl->dstExtAddrInfo.extAddr[6], bind_tbl->dstExtAddrInfo.extAddr[7]);
+                bind_tbl->used = false;
+            }
+        }
+        bind_tbl++;
+    }
+}
 
 
 static void buttonCheckCommand(uint8_t btNum) {
@@ -71,12 +185,14 @@ static void buttonCheckCommand(uint8_t btNum) {
 
     if (g_appCtx.button[btNum-1].ctn == 1) {
         buttonSinglePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 2) {
-//        buttonDoublePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 3) {
-//        buttonTriplePressed(btNum);
-//    } else if (g_appCtx.button[btNum-1].ctn == 4) {
-//        buttonQuadruplePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 2) {
+        buttonDoublePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 3) {
+        buttonTriplePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 4) {
+        buttonQuadruplePressed(btNum);
+    } else if (g_appCtx.button[btNum-1].ctn == 5) {
+        buttonQuintuplePressed(btNum);
     }
 
     g_appCtx.button[btNum-1].ctn = 0;

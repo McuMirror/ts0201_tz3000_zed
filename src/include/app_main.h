@@ -6,9 +6,6 @@
 #include "bdb.h"
 #include "ota.h"
 
-#include "zcl_relative_humidity_measurement.h"
-#include "zcl_onoffSwitchCfg.h"
-#include "zcl_custom_attr.h"
 #include "app_timer.h"
 #include "app_config.h"
 #include "app_button.h"
@@ -22,6 +19,9 @@
 #include "app_i2c.h"
 #include "app_sensor.h"
 #include "app_binding.h"
+#include "zcl_custom_attr.h"
+#include "zcl_onoffSwitchCfg.h"
+#include "zcl_relative_humidity_measurement.h"
 
 typedef struct {
     uint8_t keyType; /* CERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
@@ -39,13 +39,7 @@ typedef struct {
     ev_timer_event_t *timerNoJoinedEvt;
     ev_timer_event_t *timerAppBindEvt;
 
-//    uint32_t short_poll;
-//    uint32_t long_poll;
-//    uint32_t current_poll;
-
-//    button_t button;
     button_t button[MAX_BUTTON_NUM];
-//    u32 keyPressedTime;
     u8  keyPressed;
 
     uint16_t ledOnTime;
@@ -60,7 +54,10 @@ typedef struct {
 
     uint32_t time_without_joined;
 
-    bool net_steer_start;
+    bool     net_steer_start;
+    bool     find_bind_flag;
+    uint8_t  find_bind_src_ep;
+    uint8_t  find_bind_dst_ep;
 
     app_linkKey_info_t tcLinkKey;
 } app_ctx_t;
@@ -88,6 +85,7 @@ void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf);
 void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);
 void app_otaProcessMsgHandler(uint8_t evt, uint8_t status);
 void app_wakeupPinLevelChange();
+int32_t app_bdbFindAndBindStart(void *arg);
 
 
 #endif /* SRC_INCLUDE_APP_MAIN_H_ */
