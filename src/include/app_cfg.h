@@ -51,6 +51,9 @@
 #define LONG_POLL               REPORTING_MIN
 #define TIMEOUT_NET             TIMEOUT_30MIN
 
+/* for OTA */
+#define APP_OTA_PERIODIC_QUERY_INTERVAL (6 * 60 * 60)     /* start the OTA request after the set seconds */
+
 /* for onoff */
 #define ONOFFCFG_AMT            2               /* 2 endpoints for OnOff temperature and humidity controls */
 
