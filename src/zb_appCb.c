@@ -135,7 +135,7 @@ void zb_bdbInitCb(u8 status, u8 joinedNetwork){
             app_setPollRate(TIMEOUT_1MIN);
 
 #ifdef ZCL_OTA
-			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+			ota_queryStart(APP_OTA_PERIODIC_QUERY_INTERVAL);
 #endif
 
 #ifdef ZCL_POLL_CTRL
@@ -206,7 +206,7 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 			app_zclCheckInStart();
 #endif
 #ifdef ZCL_OTA
-			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+			ota_queryStart(APP_OTA_PERIODIC_QUERY_INTERVAL);
 #endif
 //#if FIND_AND_BIND_SUPPORT
 //			//start Finding & Binding
@@ -315,7 +315,7 @@ void app_otaProcessMsgHandler(u8 evt, u8 status)
 		if(status == ZCL_STA_SUCCESS){
 			ota_mcuReboot();
 		}else{
-			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+			ota_queryStart(APP_OTA_PERIODIC_QUERY_INTERVAL);
 		}
 	}else if(evt == OTA_EVT_IMAGE_DONE){
 		zb_setPollRate(POLL_RATE * 3);
