@@ -40,11 +40,12 @@
 //#define BOARD                               BOARD_IHSENO_IC_V0
 //#define BOARD                               BOARD_ZBEACON
 //#define BOARD                               BOARD_ZG_227ZS
+//#define BOARD                               BOARD_Z_WXD
 #define BOARD                               BOARD_TH01_ZBEACON
 #endif
 
 #define APP_RELEASE                         0x10        //app release 1.0
-#define APP_BUILD                           0x08        //app build 08, full version - v1.0.08
+#define APP_BUILD                           0x09        //app build 09, full version - v1.0.09
 
 #define STACK_RELEASE                       0x30        //stack release 3.0
 #define STACK_BUILD                         0x01        //stack build 01
@@ -100,6 +101,11 @@
  * 0x22 - Tuya Temperature and Humidity sensors (board_zbeacon.h)
  * 0x23 - Tuya Temperature and Humidity sensors (board_zg_227zs.h)
  * 0x24 - Tuya Temperature and Humidity sensors (board_th01_zbeacon.h)
+ * 0x25 - Tuya mini switch ZG-301Z Hobean
+ * 0x26 - LoraTap wireless battery switch (TS0041-TS0046)
+ * 0x27 - Tuya wireless battery switch (1 ... 6 button)
+ * 0x28 - Tuya Temperature and Humidity sensors (board_z_wxd.h)
+ * 0x29 - Tuya Temperature and Humidity sensors (*.h)
  *
  */
 
