@@ -81,12 +81,13 @@
     <summary>Раскрыть</summary>
 
 <div align="center"> 
-<a>В таблице приведены файлы для каждого датчика</a>
 
 | Custom Zigbee Model | Original Zigbee Model | Z2M Model | Original Zigbee Manufacturer | Update method |
 |:-------------------:|:---------------------:|:---------:|:----------------------------:|:-------------:|
 | TS0201-z-SlD<br>TS0201-z15-SlD | TS0201 | TS0201 | _TZ3000_xr3htd96<br>_TZ3000_fllyghyj<br>_TZ3000_0s1izerx | OTA file |
 | TS0201-z21-SlD     | TS0201 | TS0201 | _TZ3000_dowj6gyi | OTA file |
+
+<a>В таблице приведены файлы и метод обновления для каждого датчика</a>
 
 </div>
 
